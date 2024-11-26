@@ -1,4 +1,4 @@
-function calculadora(valor1, valor2, operador) {
+export function calculadora(valor1, valor2, operador) {
     let resultado;
 
     switch (operador) {
@@ -22,13 +22,12 @@ function calculadora(valor1, valor2, operador) {
     return resultado;
 }
 
-let soma = calculadora(2,2,"+")
-let sub = calculadora(5,2,"-")
-let mult = calculadora(2,3,"*")
-let div = calculadora(8,4,"/")
-console.log(soma)
-console.log(sub)
-console.log(mult)
-console.log(div)
-
+//let soma = calculadora(2,2,"+")
+//let sub = calculadora(5,2,"-")
+//let mult = calculadora(2,3,"*")
+//let div = calculadora(8,4,"/")
+//console.log(soma)
+//console.log(sub)
+//console.log(mult)
+//console.log(div)///
   
