@@ -2,20 +2,17 @@ const searchBtn = document.getElementById('searchBtn');
 const ipInput = document.getElementById('ipInput');
 const ipTable = document.getElementById('ipTable');
 
-// URL do serviço de proxy CORS
-const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
-
-// Buscar informações do IP através do proxy
+// Buscar informações do IP
 async function fetchIPData(ip) {
-    const url = `${CORS_PROXY}https://ipinfo.io/${ip}/json`; // Prefixando com o proxy CORS
+    const url = `https://ipapi.co/${ip}/json/`; // Use uma API com suporte CORS
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error('Erro na API');
         const data = await response.json();
         return {
-            ip: ip,
+            ip: data.ip || ip,
             org: data.org || 'N/A',
-            country: data.country || 'N/A',
+            country: data.country_name || 'N/A',
             city: data.city || 'N/A'
         };
     } catch (error) {
