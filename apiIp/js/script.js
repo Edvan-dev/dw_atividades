@@ -1,17 +1,16 @@
-const searchBtn = document.getElementById('searchBtn');
+ const searchBtn = document.getElementById('searchBtn');
         const ipInput = document.getElementById('ipInput');
         const ipTable = document.getElementById('ipTable');
 
-        // Buscar informações do IP via cors-anywhere
+        // Buscar informações do IP usando a API ip-api
         async function fetchIPData(ip) {
-            const token = '58a3937219ee1c';
-            const url = `https://cors-anywhere.herokuapp.com/https://ipinfo.io/${ip}/json?token=${token}`;
+            const url = `http://ip-api.com/json/${ip}`;
             try {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Erro na API');
                 const data = await response.json();
                 return {
-                    ip: ip,
+                    ip: data.query || 'N/A',
                     org: data.org || 'N/A',
                     country: data.country || 'N/A',
                     city: data.city || 'N/A'
