@@ -4,23 +4,29 @@ const ipTable = document.getElementById('ipTable');
 
 // Buscar informações do IP
 async function fetchIPData(ip) {
-    let url = 'http://ip-api.com/json'; // Sem necessidade de token para consultas básicas
+    let url = 'https://freegeoip.app/json/'; // Para obter o IP do usuário
     if (ip) {
-        url = `http://ip-api.com/json/${ip}`;
+        url = `https://freegeoip.app/json/${ip}`;
     }
+
     try {
         const response = await fetch(url);
-        if (!response.ok) throw new Error('Erro na API');
+        if (!response.ok) {
+            // Tratamento de erro mais robusto
+            const errorText = await response.text();
+            throw new Error(`Erro na API: ${response.status} - ${errorText}`);
+        }
         const data = await response.json();
 
-        if (data.status === 'fail') { // ip-api retorna "fail" em caso de erro
-            throw new Error(data.message || 'IP inválido'); // Mensagem de erro mais informativa
-        }
+        // freegeoip.app retorna um formato diferente
         return {
-            ip: data.query || ip || 'N/A',
-            org: data.org || 'N/A', // Nem todos os provedores retornam organização
-            country: data.country || 'N/A',
-            city: data.city || 'N/A'
+            ip: data.ip || ip || 'N/A', // Usamos o IP retornado ou o IP de entrada
+            org: 'N/A', // freegeoip.app não fornece informações de organização
+            country: data.country_code || 'N/A', // Nome do campo diferente
+            city: data.city || 'N/A',
+            region: data.region_name || 'N/A', // Adicionando a região, que freegeoip fornece
+            latitude: data.latitude || 'N/A', // Adicionando latitude
+            longitude: data.longitude || 'N/A' // Adicionando longitude
         };
     } catch (error) {
         console.error("Erro ao buscar IP:", error);
@@ -41,6 +47,9 @@ async function addIPInfo() {
             <td>${ipData.org}</td>
             <td>${ipData.country}</td>
             <td>${ipData.city}</td>
+            <td>${ipData.region}</td> <--- Nova coluna para região
+            <td>${ipData.latitude}</td> <--- Nova coluna para latitude
+            <td>${ipData.longitude}</td> <--- Nova coluna para longitude
             <td class="clear-btn">X</td>
         `;
         ipTable.appendChild(newRow);
