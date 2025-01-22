@@ -2,9 +2,12 @@ const searchBtn = document.getElementById('searchBtn');
 const ipInput = document.getElementById('ipInput');
 const ipTable = document.getElementById('ipTable');
 
+// URL do serviço de proxy CORS
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+
 // Buscar informações do IP através do proxy
 async function fetchIPData(ip) {
-    const url = `/api/ipinfo/${ip}`;
+    const url = `${CORS_PROXY}https://ipinfo.io/${ip}/json`; // Prefixando com o proxy CORS
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error('Erro na API');
