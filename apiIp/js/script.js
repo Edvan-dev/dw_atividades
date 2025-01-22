@@ -1,55 +1,45 @@
- const searchBtn = document.getElementById('searchBtn');
-        const ipInput = document.getElementById('ipInput');
-        const ipTable = document.getElementById('ipTable');
+document.getElementById('searchBtn').addEventListener('click', () => {
+    const ipInput = document.getElementById('ipInput').value.trim();
 
-        // Buscar informações do IP usando a API ip-api
-        async function fetchIPData(ip) {
-            const url = 'https://ipwhois.app/json/${ipInput}';
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Erro na API');
-                const data = await response.json();
-                return {
-                    ip: data.query || 'N/A',
-                    org: data.org || 'N/A',
-                    country: data.country || 'N/A',
-                    city: data.city || 'N/A'
-                };
-            } catch (error) {
-                alert('IP inválido ou erro na consulta.');
-                return null;
+    if (!ipInput) {
+        alert('Por favor, insira um endereço IP válido.');
+        return;
+    }
+
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    const apiUrl = `http://ip-api.com/json/${ipInput}`;
+
+    fetch(proxyUrl + apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na requisição.');
             }
-        }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === "fail") {
+                alert('Endereço IP inválido ou não encontrado.');
+                return;
+            }
 
-        // Adicionar os dados na tabela
-        async function addIPInfo() {
-            const ip = ipInput.value.trim();
-            if (!ip) return alert('Digite um endereço IP válido.');
+            const tableBody = document.getElementById('ipTable');
+            const row = `<tr>
+                <td>${data.query}</td>
+                <td>${data.org || 'N/A'}</td>
+                <td>${data.country || 'N/A'}</td>
+                <td>${data.city || 'N/A'}</td>
+                <td><button class="clear-btn">X</button></td>
+            </tr>`;
+            tableBody.innerHTML += row;
 
-            const ipData = await fetchIPData(ip);
-            if (ipData) {
-                const newRow = document.createElement('tr');
-                newRow.innerHTML = `
-                    <td>${ipData.ip}</td>
-                    <td>${ipData.org}</td>
-                    <td>${ipData.country}</td>
-                    <td>${ipData.city}</td>
-                    <td class="clear-btn">X</td>
-                `;
-                ipTable.appendChild(newRow);
-                ipInput.value = '';
-
-                // Adicionar funcionalidade de remoção
-                newRow.querySelector('.clear-btn').addEventListener('click', () => {
-                    newRow.remove();
+            document.querySelectorAll('.clear-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    this.closest('tr').remove();
                 });
-            }
-        }
-
-        // Acionar ação no botão de pesquisa
-        searchBtn.addEventListener('click', addIPInfo);
-
-        // Permitir Enter para buscar IP
-        ipInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addIPInfo();
+            });
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Não foi possível completar a requisição.');
         });
+});
