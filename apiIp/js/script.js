@@ -5,21 +5,20 @@ const ipTable = document.getElementById('ipTable');
 // Buscar informações do IP
 async function fetchIPData(ip) {
     const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-    const token = '58a3937219ee1c';
-    const url = `${proxyUrl}https://ipinfo.io/${ip}/json?token=${token}`;
+    const apiUrl = `https://ipinfo.io/${ip}/json`;
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(proxyUrl + apiUrl);
         if (!response.ok) throw new Error('Erro na API');
         const data = await response.json();
         return {
             ip: ip,
             org: data.org || 'N/A',
             country: data.country || 'N/A',
-            city: data.city || 'N/A'
+            city: data.city || 'N/A',
         };
     } catch (error) {
-        alert('IP inválido ou erro na consulta.');
+        alert('Erro ao buscar dados do IP: ' + error.message);
         return null;
     }
 }
