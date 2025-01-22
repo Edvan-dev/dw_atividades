@@ -4,11 +4,9 @@ const ipTable = document.getElementById('ipTable');
 
 // Buscar informações do IP
 async function fetchIPData(ip) {
-    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-    const apiUrl = `https://ipinfo.io/${ip}/json`;
-
+    const url = `http://ip-api.com/json/${ip}`;
     try {
-        const response = await fetch(proxyUrl + apiUrl);
+        const response = await fetch(url);
         if (!response.ok) throw new Error('Erro na API');
         const data = await response.json();
         return {
@@ -22,6 +20,7 @@ async function fetchIPData(ip) {
         return null;
     }
 }
+
 
 
 // Adicionar os dados na tabela
