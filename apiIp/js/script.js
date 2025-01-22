@@ -2,25 +2,28 @@ const searchBtn = document.getElementById('searchBtn');
 const ipInput = document.getElementById('ipInput');
 const ipTable = document.getElementById('ipTable');
 
-// Buscar informações do IP através de proxy público
-async function fetchIPData(ip) {
-    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-    const apiUrl = `https://ipinfo.io/${ip}/json`;
-    const url = `${proxyUrl}${apiUrl}`;
+// URL do proxy público para evitar CORS
+const PROXY_URL = 'https://api.allorigins.win/get?url=';
 
+// URL da API externa pública
+const API_URL = 'https://ipinfo.io';
+
+// Buscar informações do IP através do proxy
+async function fetchIPData(ip) {
+    const url = `${PROXY_URL}${encodeURIComponent(`${API_URL}/${ip}/json`)}`;
     try {
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer YOUR_API_TOKEN`, // Remova se não precisar de token
-            },
-        });
+        const response = await fetch(url);
         if (!response.ok) throw new Error('Erro na API');
-        const data = await response.json();
+
+        // O AllOrigins retorna o conteúdo da API no formato {contents: "dados JSON"}
+        const proxyData = await response.json();
+        const data = JSON.parse(proxyData.contents);
+
         return {
-            ip: data.ip || ip,
+            ip: ip,
             org: data.org || 'N/A',
             country: data.country || 'N/A',
-            city: data.city || 'N/A'
+            city: data.city || 'N/A',
         };
     } catch (error) {
         alert('IP inválido ou erro na consulta.');
