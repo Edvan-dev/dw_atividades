@@ -3,30 +3,43 @@ const ipInput = document.getElementById('ipInput');
 const ipTable = document.getElementById('ipTable');
 
 // Buscar informações do IP
+const abstractApiKey = '21e5259ab28546a9a6e4a6cda400771a'; // Substitua pela sua chave real
+
 async function fetchIPData(ip) {
-    let url = 'https://freegeoip.app/json/'; // Para obter o IP do usuário
-    if (ip) {
-        url = `https://freegeoip.app/json/${ip}`;
-    }
+    let ipifyUrl = 'https://api.ipify.org?format=json'; // URL do ipify
 
     try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            // Tratamento de erro mais robusto
-            const errorText = await response.text();
-            throw new Error(`Erro na API: ${response.status} - ${errorText}`);
+        // Obter o IP usando ipify
+        const ipifyResponse = await fetch(ipifyUrl);
+        if (!ipifyResponse.ok) {
+            throw new Error(`Erro ao obter IP do ipify: ${ipifyResponse.status}`);
         }
-        const data = await response.json();
+        const ipifyData = await ipifyResponse.json();
+        const ipAddress = ip || ipifyData.ip; // Usa o IP fornecido ou o retornado pelo ipify
 
-        // freegeoip.app retorna um formato diferente
+        // Obter geolocalização usando Abstract API
+        const abstractApiUrl = `https://ipgeolocation.abstractapi.com/v1/?api_key=${abstractApiKey}&ip_address=${ipAddress}`;
+        const abstractApiResponse = await fetch(abstractApiUrl);
+
+        if (!abstractApiResponse.ok) {
+            const errorText = await abstractApiResponse.text();
+            throw new Error(`Erro na API do Abstract: ${abstractApiResponse.status} - ${errorText}`);
+        }
+
+        const abstractApiData = await abstractApiResponse.json();
+
+        if (abstractApiData.error) {
+            throw new Error(`Erro do Abstract API: ${abstractApiData.error.message}`);
+        }
+
         return {
-            ip: data.ip || ip || 'N/A', // Usamos o IP retornado ou o IP de entrada
-            org: 'N/A', // freegeoip.app não fornece informações de organização
-            country: data.country_code || 'N/A', // Nome do campo diferente
-            city: data.city || 'N/A',
-            region: data.region_name || 'N/A', // Adicionando a região, que freegeoip fornece
-            latitude: data.latitude || 'N/A', // Adicionando latitude
-            longitude: data.longitude || 'N/A' // Adicionando longitude
+            ip: ipAddress,
+            org: abstractApiData.connection.isp || 'N/A', // Obtendo a organização (ISP)
+            country: abstractApiData.country.name || 'N/A',
+            city: abstractApiData.city || 'N/A',
+            region: abstractApiData.region || 'N/A',
+            latitude: abstractApiData.latitude || 'N/A',
+            longitude: abstractApiData.longitude || 'N/A',
         };
     } catch (error) {
         console.error("Erro ao buscar IP:", error);
@@ -34,6 +47,8 @@ async function fetchIPData(ip) {
         return null;
     }
 }
+
+// Resto do seu código (addIPInfo, etc.) permanece igual (com as colunas adicionadas na tabela, como no exemplo anterior).
 // Adicionar os dados na tabela
 async function addIPInfo() {
     const ip = ipInput.value.trim();
