@@ -3,33 +3,38 @@ const ipInput = document.getElementById('ipInput');
 const ipTable = document.getElementById('ipTable');
 
 // Buscar informações do IP
-// Buscar informações do IP
+const searchBtn = document.getElementById('searchBtn');
+const ipInput = document.getElementById('ipInput');
+const ipTable = document.getElementById('ipTable');
+const token = '58a3937219ee1c'; // Substitua pelo seu token real
+
 async function fetchIPData(ip) {
-    const url = `https://ip-api.io/json/${ip}?fields=ip,isp,country_name,city`;
+    let url = `https://ipinfo.io/json?token=${token}`;
+    if (ip) {
+        url = `https://ipinfo.io/${ip}/json?token=${token}`;
+    }
 
     try {
         const response = await fetch(url);
-        if (!response.ok) throw new Error('Erro na API');
-
-        const data = await response.json();
-
-        // Verificar se a resposta contém erro
-        if (data.error) {
-            alert(`Erro: ${data.reason}`);
-            return null;
+        if (!response.ok) {
+            const errorText = await response.text(); // Tenta obter o texto do erro do servidor
+            throw new Error(`Erro na API: ${response.status} - ${errorText}`);
         }
-
+        const data = await response.json();
         return {
-            ip: data.ip || 'N/A',
-            org: data.isp || 'N/A',
-            country: data.country_name || 'N/A',
-            city: data.city || 'N/A',
+            ip: data.ip || ip || 'N/A', // Usa o IP fornecido ou o retornado pela API
+            org: data.org || 'N/A',
+            country: data.country || 'N/A',
+            city: data.city || 'N/A'
         };
     } catch (error) {
-        alert('Erro ao buscar informações do IP. Verifique o endereço e tente novamente.');
+        console.error('Erro na consulta:', error); // Imprime o erro no console para debug
+        alert('IP inválido ou erro na consulta. Verifique o console para mais detalhes.');
         return null;
     }
 }
+
+// ... (resto do código igual)
 
 // Adicionar os dados na tabela
 async function addIPInfo() {
