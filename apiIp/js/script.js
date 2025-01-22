@@ -4,14 +4,13 @@ const ipTable = document.getElementById('ipTable');
 
 // Buscar informações do IP
 async function fetchIPData(ip) {
-    const token = '58a3937219ee1c';
     const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    const token = '58a3937219ee1c';
     const url = `${proxyUrl}https://ipinfo.io/${ip}/json?token=${token}`;
-    //const url = `https://ipinfo.io/${ip}/json?token=${token}`;
 
     try {
         const response = await fetch(url);
-        if (!response.ok) throw new Error(`Erro na API: ${response.statusText}`);
+        if (!response.ok) throw new Error('Erro na API');
         const data = await response.json();
         return {
             ip: ip,
@@ -20,11 +19,11 @@ async function fetchIPData(ip) {
             city: data.city || 'N/A'
         };
     } catch (error) {
-        console.error('Erro ao buscar dados do IP:', error);
-        alert('Erro ao buscar informações do IP. Verifique a conexão ou configurações do navegador.');
+        alert('IP inválido ou erro na consulta.');
         return null;
     }
 }
+
 
 // Adicionar os dados na tabela
 async function addIPInfo() {
