@@ -3,25 +3,33 @@ const ipInput = document.getElementById('ipInput');
 const ipTable = document.getElementById('ipTable');
 
 // Buscar informações do IP
+// Buscar informações do IP
 async function fetchIPData(ip) {
-    const url = `http://ip-api.com/json/${ip}`;
+    const url = `https://ip-api.io/json/${ip}?fields=ip,isp,country_name,city`;
+
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error('Erro na API');
+
         const data = await response.json();
+
+        // Verificar se a resposta contém erro
+        if (data.error) {
+            alert(`Erro: ${data.reason}`);
+            return null;
+        }
+
         return {
-            ip: ip,
-            org: data.org || 'N/A',
-            country: data.country || 'N/A',
+            ip: data.ip || 'N/A',
+            org: data.isp || 'N/A',
+            country: data.country_name || 'N/A',
             city: data.city || 'N/A',
         };
     } catch (error) {
-        alert('Erro ao buscar dados do IP: ' + error.message);
+        alert('Erro ao buscar informações do IP. Verifique o endereço e tente novamente.');
         return null;
     }
 }
-
-
 
 // Adicionar os dados na tabela
 async function addIPInfo() {
