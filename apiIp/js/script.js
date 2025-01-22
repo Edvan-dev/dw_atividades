@@ -4,7 +4,7 @@
 
         // Buscar informações do IP usando a API ip-api
         async function fetchIPData(ip) {
-            const url = `http://ip-api.com/json/${ip}`;
+            const url = 'https://ipwhois.app/json/${ipInput}';
             try {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Erro na API');
